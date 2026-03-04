@@ -106,24 +106,34 @@ echo ""
 echo "Step 9: Building and starting Docker containers..."
 cd "${DOCKER_DIR}"
 
-# Build the image
+# Build the image (only paddle-ocr-api service)
 echo "Building paddle-ocr-api image..."
-docker-compose build paddle-ocr-api
+if docker-compose build paddle-ocr-api; then
+    echo "✓ Build successful"
+else
+    echo "⚠ Build encountered issues, but continuing..."
+fi
 
-# Start the service
+# Start the service (only paddle-ocr-api service)
 echo "Starting paddle-ocr-api service..."
-docker-compose up -d paddle-ocr-api
+if docker-compose up -d paddle-ocr-api; then
+    echo "✓ Service started"
+else
+    echo "✗ Failed to start service"
+    echo "Check logs with: docker-compose logs paddle-ocr-api"
+    exit 1
+fi
 
 # Wait for service to be healthy
 echo ""
 echo "Waiting for service to be ready..."
 sleep 10
 
-# Test health endpoint
+# Test health endpoint (updated to use correct API path)
 echo ""
 echo "Step 10: Testing API health..."
 for i in {1..10}; do
-    if curl -f http://localhost:8001/health > /dev/null 2>&1; then
+    if curl -f http://localhost:8001/api/v1/health > /dev/null 2>&1; then
         echo "✓ API is healthy!"
         break
     else
@@ -134,13 +144,18 @@ for i in {1..10}; do
     if [ $i -eq 10 ]; then
         echo "⚠ Warning: API health check failed"
         echo "Check logs with: docker-compose logs paddle-ocr-api"
+        echo "Try accessing manually: curl http://localhost:8001/api/v1/health"
     fi
 done
 
 # Restart Nginx to apply configuration
 echo ""
 echo "Step 11: Restarting Nginx..."
-docker-compose restart nginx || echo "Note: Nginx restart failed or not running"
+if docker-compose restart nginx 2>/dev/null; then
+    echo "✓ Nginx restarted successfully"
+else
+    echo "Note: Nginx restart failed or not running (this is OK if Nginx runs elsewhere)"
+fi
 
 echo ""
 echo "======================================"
