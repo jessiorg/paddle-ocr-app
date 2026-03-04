@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="PaddleOCR - Advanced Optical Character Recognition for text extraction from images">
+    <meta name="keywords" content="OCR, PaddleOCR, text extraction, image to text">
+    <title>PaddleOCR - Advanced Text Extraction</title>
+    <link rel="stylesheet" href="/paddle-ocr/css/style.css">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E📄%3C/text%3E%3C/svg%3E">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <h1 class="logo">
+                    <span class="logo-icon">📄</span>
+                    PaddleOCR
+                </h1>
+                <p class="tagline">Advanced Optical Character Recognition</p>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <!-- Status Banner -->
+            <div id="statusBanner" class="status-banner" style="display: none;">
+                <span class="status-icon"></span>
+                <span class="status-message"></span>
+                <button class="status-close" onclick="closeStatus()">&times;</button>
+            </div>
+
+            <!-- Upload Section -->
+            <section class="upload-section">
+                <h2>Upload Image</h2>
+                <div class="upload-area" id="uploadArea">
+                    <input type="file" id="fileInput" accept="image/png,image/jpeg,image/jpg,application/pdf" hidden>
+                    <div class="upload-content">
+                        <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="17 8 12 3 7 8"></polyline>
+                            <line x1="12" y1="3" x2="12" y2="15"></line>
+                        </svg>
+                        <p class="upload-text">Drag and drop your image here</p>
+                        <p class="upload-subtext">or</p>
+                        <button class="btn btn-primary" onclick="document.getElementById('fileInput').click()">
+                            Browse Files
+                        </button>
+                        <p class="upload-info">Supported: PNG, JPG, JPEG, PDF (Max 10MB)</p>
+                    </div>
+                </div>
+
+                <!-- Preview Area -->
+                <div id="previewArea" class="preview-area" style="display: none;">
+                    <div class="preview-header">
+                        <h3>Selected Image</h3>
+                        <button class="btn btn-secondary btn-sm" onclick="clearImage()">Change Image</button>
+                    </div>
+                    <div class="preview-image-container">
+                        <img id="previewImage" src="" alt="Preview">
+                    </div>
+                    <div class="preview-info">
+                        <span id="fileName"></span>
+                        <span id="fileSize"></span>
+                    </div>
+                </div>
+
+                <!-- Options -->
+                <div class="options-section">
+                    <div class="option-group">
+                        <label for="languageSelect" class="option-label">
+                            <svg class="option-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                            </svg>
+                            Language
+                        </label>
+                        <select id="languageSelect" class="select-input">
+                            <option value="en">English</option>
+                            <option value="ch">Chinese</option>
+                            <option value="fr">French</option>
+                            <option value="german">German</option>
+                            <option value="korean">Korean</option>
+                            <option value="japan">Japanese</option>
+                            <option value="arabic">Arabic</option>
+                            <option value="spanish">Spanish</option>
+                            <option value="portuguese">Portuguese</option>
+                            <option value="russian">Russian</option>
+                        </select>
+                    </div>
+
+                    <button id="extractBtn" class="btn btn-primary btn-large" onclick="extractText()" disabled>
+                        <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                            <polyline points="10 9 9 9 8 9"></polyline>
+                        </svg>
+                        Extract Text
+                    </button>
+                </div>
+            </section>
+
+            <!-- Results Section -->
+            <section id="resultsSection" class="results-section" style="display: none;">
+                <div class="results-header">
+                    <h2>Extracted Text</h2>
+                    <div class="results-actions">
+                        <button class="btn btn-secondary" onclick="copyText()">
+                            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                            </svg>
+                            Copy
+                        </button>
+                        <button class="btn btn-secondary" onclick="downloadText()">
+                            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="7 10 12 15 17 10"></polyline>
+                                <line x1="12" y1="15" x2="12" y2="3"></line>
+                            </svg>
+                            Download
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Statistics -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-label">Confidence</div>
+                        <div class="stat-value" id="confidenceValue">-</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Processing Time</div>
+                        <div class="stat-value" id="processingTime">-</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Word Count</div>
+                        <div class="stat-value" id="wordCount">-</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Character Count</div>
+                        <div class="stat-value" id="charCount">-</div>
+                    </div>
+                </div>
+
+                <!-- Text Output -->
+                <div class="text-output">
+                    <textarea id="extractedText" class="text-area" readonly></textarea>
+                </div>
+
+                <!-- Detailed Results -->
+                <div class="detailed-results">
+                    <button class="accordion-toggle" onclick="toggleDetailedResults()">
+                        <span>Detailed Results</span>
+                        <svg class="accordion-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                    </button>
+                    <div id="detailedResults" class="detailed-content" style="display: none;">
+                        <div id="detailedResultsContent"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Features Section -->
+            <section class="features-section">
+                <h2>Features</h2>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">🚀</div>
+                        <h3>Fast Processing</h3>
+                        <p>Lightning-fast OCR processing powered by PaddleOCR's optimized neural networks</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🌍</div>
+                        <h3>Multi-Language</h3>
+                        <p>Support for 10+ languages including English, Chinese, Arabic, and more</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🎯</div>
+                        <h3>High Accuracy</h3>
+                        <p>Industry-leading accuracy with confidence scores for each detection</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🔒</div>
+                        <h3>Secure Processing</h3>
+                        <p>Your images are processed securely and deleted immediately after extraction</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Examples Section -->
+            <section class="examples-section">
+                <h2>Try Example Images</h2>
+                <div class="examples-grid">
+                    <button class="example-card" onclick="loadExample('receipt')">
+                        <div class="example-icon">🧾</div>
+                        <span>Receipt</span>
+                    </button>
+                    <button class="example-card" onclick="loadExample('document')">
+                        <div class="example-icon">📄</div>
+                        <span>Document</span>
+                    </button>
+                    <button class="example-card" onclick="loadExample('business-card')">
+                        <div class="example-icon">💼</div>
+                        <span>Business Card</span>
+                    </button>
+                    <button class="example-card" onclick="loadExample('handwritten')">
+                        <div class="example-icon">✍️</div>
+                        <span>Handwritten</span>
+                    </button>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <p>&copy; 2026 PaddleOCR Application. Powered by <a href="https://github.com/PaddlePaddle/PaddleOCR" target="_blank">PaddleOCR</a></p>
+                <p class="footer-links">
+                    <a href="https://github.com/jessiorg/paddle-ocr-app" target="_blank">GitHub</a>
+                    <span>•</span>
+                    <a href="https://github.com/PaddlePaddle/PaddleOCR" target="_blank">Documentation</a>
+                    <span>•</span>
+                    <a href="#" onclick="showApiDocs(); return false;">API</a>
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay" style="display: none;">
+        <div class="loading-spinner">
+            <div class="spinner"></div>
+            <p class="loading-text">Processing image...</p>
+            <p class="loading-subtext">This may take a few seconds</p>
+        </div>
+    </div>
+
+    <script src="/paddle-ocr/js/app.js"></script>
+</body>
+</html>
