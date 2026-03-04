@@ -1,0 +1,85 @@
+# PaddleOCR Service Definition
+# Add this to your main docker-compose.yml file
+
+version: '3.8'
+
+services:
+  paddle-ocr-api:
+    container_name: paddle-ocr-api
+    build:
+      context: /data/paddle-ocr-backend
+      dockerfile: Dockerfile
+    image: paddle-ocr-api:latest
+    restart: unless-stopped
+    
+    # Environment variables
+    environment:
+      # API Configuration
+      - API_HOST=0.0.0.0
+      - API_PORT=8000
+      - API_WORKERS=4
+      - LOG_LEVEL=info
+      
+      # PaddleOCR Settings
+      - OCR_USE_GPU=false
+      - OCR_ENABLE_MKLDNN=true
+      - OCR_USE_ANGLE_CLS=true
+      - OCR_DET_LIMIT_SIDE_LEN=960
+      - OCR_REC_BATCH_NUM=6
+      
+      # Upload Limits
+      - MAX_FILE_SIZE=10485760  # 10MB
+      - ALLOWED_EXTENSIONS=png,jpg,jpeg,pdf
+      
+      # Security
+      - CORS_ORIGINS=http://localhost,https://your-domain.com
+    
+    # Port mapping (internal use only, proxied by Nginx)
+    ports:
+      - "8001:8000"
+    
+    # Volume mounts
+    volumes:
+      # Logs
+      - /data/paddle-ocr-backend/logs:/var/log
+      # Models cache (persistent)
+      - paddle-ocr-models:/root/.paddleocr
+    
+    # Resource limits
+    deploy:
+      resources:
+        limits:
+          cpus: '4'
+          memory: 4G
+        reservations:
+          cpus: '2'
+          memory: 2G
+    
+    # Health check
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    
+    # Logging
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    
+    # Network
+    networks:
+      - webproxy
+
+# Volumes
+volumes:
+  paddle-ocr-models:
+    driver: local
+
+# Networks
+networks:
+  webproxy:
+    external: true
