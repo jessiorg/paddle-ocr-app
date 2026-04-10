@@ -9,7 +9,7 @@ python-multipart==0.0.17
 
 # OCR Engine - use stable versions
 paddleocr==2.8.1
-paddlepaddle==3.0.0b1  # Stable beta
+paddlepaddle==3.0.0b2  # Stable beta
 
 # Image Processing
 opencv-python-headless==4.10.0.84
