@@ -42,7 +42,7 @@ class Config:
     
     # OCR settings
     OCR_USE_GPU = os.getenv('OCR_USE_GPU', 'false').lower() == 'true'
-    OCR_ENABLE_MKLDNN = os.getenv.*
+    # OCR_ENABLE_MKLDNN = os.getenv('OCR_ENABLE_MKLDNN', 'false').lower() == 'true'  # DISABLED
     # Removed: enable_mkldnn causes issues with paddlepaddle 3.x
     OCR_USE_ANGLE_CLS = os.getenv('OCR_USE_ANGLE_CLS', 'true').lower() == 'true'
     OCR_DET_LIMIT_SIDE_LEN = int(os.getenv('OCR_DET_LIMIT_SIDE_LEN', 960))
