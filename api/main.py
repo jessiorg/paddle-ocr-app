@@ -42,7 +42,8 @@ class Config:
     
     # OCR settings
     OCR_USE_GPU = os.getenv('OCR_USE_GPU', 'false').lower() == 'true'
-    OCR_ENABLE_MKLDNN = os.getenv('OCR_ENABLE_MKLDNN', 'true').lower() == 'true'
+    OCR_ENABLE_MKLDNN = os.getenv.*
+    # Removed: enable_mkldnn causes issues with paddlepaddle 3.x
     OCR_USE_ANGLE_CLS = os.getenv('OCR_USE_ANGLE_CLS', 'true').lower() == 'true'
     OCR_DET_LIMIT_SIDE_LEN = int(os.getenv('OCR_DET_LIMIT_SIDE_LEN', 960))
     OCR_REC_BATCH_NUM = int(os.getenv('OCR_REC_BATCH_NUM', 6))
@@ -96,10 +97,10 @@ def get_ocr_model(language: str = 'en') -> PaddleOCR:
                 use_angle_cls=config.OCR_USE_ANGLE_CLS,
                 lang=language,
                 use_gpu=config.OCR_USE_GPU,
-                enable_mkldnn=config.OCR_ENABLE_MKLDNN,
+                
                 det_limit_side_len=config.OCR_DET_LIMIT_SIDE_LEN,
                 rec_batch_num=config.OCR_REC_BATCH_NUM,
-                show_log=False
+                
             )
             logger.info(f"OCR model initialized successfully for {language}")
         except Exception as e:
