@@ -1,15 +1,15 @@
 # PaddleOCR Application - Python Dependencies
-# Updated: March 4, 2026
-# Python 3.12+ required
+# Updated: April 10, 2026
+# Fixed paddlepaddle version for stability
 
 # Core Framework
 fastapi==0.115.0
 uvicorn[standard]==0.32.0
 python-multipart==0.0.17
 
-# OCR Engine
+# OCR Engine - use stable versions
 paddleocr==2.8.1
-paddlepaddle==3.0.0b2
+paddlepaddle==3.0.0b1  # Stable beta
 
 # Image Processing
 opencv-python-headless==4.10.0.84
